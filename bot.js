@@ -1,110 +1,71 @@
-// Import required libraries
-const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
+require('dotenv').config(); // Make sure you're using .env to store sensitive info like token and API URL
+const { Client, GatewayIntentBits } = require('discord.js');
 const axios = require('axios');
-require('dotenv').config();
 
-// Create the bot client
+// Create a new Discord client
 const client = new Client({
     intents: [
-        GatewayIntentBits.Guilds, // Required for interacting with servers
-        GatewayIntentBits.GuildMessages, // Required for handling messages in servers
-        GatewayIntentBits.MessageContent // Required to read the content of messages
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent
     ]
 });
 
-// API settings
-const apiUrl = process.env.API_URL;
+// Set up your translate function
+async function translateMessage(message, targetLang) {
+    const text = message.content; // Get the message content
+    
+    console.log(`Attempting to translate: ${text}`);
 
-// Default settings
-const userLanguageCache = {}; // Cache to store user language preferences
-const defaultLanguage = 'en'; // Global fallback language for translation
-
-// Bot ready event
-client.once('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
-});
-
-// Message event
-client.on('messageCreate', async (message) => {
-    // Ignore messages from bots
-    if (message.author.bot) return;
-
-    // Command to set user language
-    if (message.content.startsWith('!setlang')) {
-        const lang = message.content.split(' ')[1];
-
-        if (!lang) {
-            message.reply('Please provide a valid language code. Example: `!setlang es` for Spanish.');
-            return;
-        }
-
-        userLanguageCache[message.author.id] = lang;
-        message.reply(`Your default translation language has been set to \`${lang}\`.`);
-        return;
-    }
-
-    // Auto-detect target language
-    const targetLang = userLanguageCache[message.author.id] || defaultLanguage;
-
-    // Translate the message
     try {
-        const response = await axios.post(apiUrl, {
-            q: message.content,
-            source: 'auto', // Automatically detect the source language
-            target: targetLang
+        // Sending the POST request to the Argos Open Tech API
+        const response = await axios.post(process.env.API_URL, {
+            q: text,        // The text you want to translate
+            source: 'auto', // Auto-detect the source language
+            target: targetLang // The language to translate to (e.g., 'es' for Spanish)
         });
 
-        const translatedText = response.data.translatedText;
+        // Log the response data for debugging
+        console.log('Translation Response:', response.data);
 
-        // Send the translated message as an embed
-        const embed = new EmbedBuilder()
-            .setColor(0x00AE86)
-            .setTitle('Translated Message')
-            .addFields(
-                { name: 'Original', value: message.content },
-                { name: 'Translated', value: translatedText }
-            )
-            .setFooter({ text: `Translated to: ${targetLang}` });
-
-        message.reply({ embeds: [embed] });
-    } catch (error) {
-        console.error('Error translating message:', error);
-        message.reply('Failed to translate the message.');
-    }
-});
-
-// Rename channel names (advanced feature)
-async function translateChannelNames(guild, language) {
-    try {
-        const channels = guild.channels.cache.filter(channel => channel.type === 0); // Text channels only
-        for (const [channelId, channel] of channels) {
-            const response = await axios.post(apiUrl, {
-                q: channel.name,
-                source: 'auto',
-                target: language
-            });
-
-            const translatedName = response.data.translatedText;
-
-            // Rename the channel
-            await channel.setName(translatedName);
-            console.log(`Renamed channel ${channel.name} to ${translatedName}`);
+        // Check if we have a valid translation and return it
+        if (response.data.translatedText) {
+            return response.data.translatedText;
+        } else {
+            console.log('Failed to get translated text:', response.data);
+            return 'Translation failed';  // Return fallback message
         }
     } catch (error) {
-        console.error('Error translating channel names:', error);
+        console.error('Error during translation:', error);
+        return 'Failed to translate the message';  // Return error message
     }
 }
 
-// Event: When a new member joins
-client.on('guildMemberAdd', async (member) => {
-    const userLang = userLanguageCache[member.id] || defaultLanguage;
-
-    // Translate channel names to the user's system language
-    await translateChannelNames(member.guild, userLang);
-
-    // Welcome message
-    member.send(`Welcome to the server! Your messages will be translated into ${userLang}. Use \`!setlang <language_code>\` to change this.`);
+// When the bot logs in and is ready
+client.once('ready', () => {
+    console.log('Bot is logged in and ready!');
+    client.user.setActivity('Translating messages', { type: 'WATCHING' });
 });
 
-// Log in the bot
-client.login(process.env.TOKEN);
+// Handling incoming messages
+client.on('messageCreate', async (message) => {
+    // Ignore messages from other bots
+    if (message.author.bot) return;
+
+    // Example: Set target language to Spanish ('es'). You can change this dynamically if needed
+    const targetLang = 'es';  // You can replace this with logic to get user system language
+
+    try {
+        // Call the translateMessage function
+        const translatedText = await translateMessage(message, targetLang);
+        
+        // Send the translated text as a reply
+        message.reply(translatedText);
+    } catch (error) {
+        console.error('Error translating message:', error);
+        message.reply('Failed to translate the message.');  // Fallback error message
+    }
+});
+
+// Log in with your bot token (replace with your actual token)
+client.login(process.env.BOT_TOKEN);
