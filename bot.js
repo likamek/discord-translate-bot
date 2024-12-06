@@ -30,6 +30,9 @@ console.log("Bot Token:", token);
 // Log in to Discord with the bot token
 client.login(token);
 
+// Track processed messages to avoid multiple triggers
+const processedMessages = new Set();
+
 // When the bot is ready
 client.once('ready', () => {
   console.log('Bot is online!');
@@ -38,14 +41,16 @@ client.once('ready', () => {
 // Function to handle translations
 async function translateText(text, targetLang) {
   try {
+    console.log(`Translating text: ${text} to ${targetLang}`);
     const response = await axios.post(API_URL, {
       q: text,
       source: 'auto',  // Auto-detect source language
       target: targetLang,
     });
+    console.log(`Translated text: ${response.data.translatedText}`);
     return response.data.translatedText;
   } catch (error) {
-    console.error('Error during translation:', error);
+    console.error('Error during translation:', error.response ? error.response.data : error.message);
     return null;
   }
 }
@@ -59,11 +64,16 @@ async function getUserLanguage(userId, guildId) {
 
 // Listen for new messages
 client.on('messageCreate', async (message) => {
-  if (message.author.bot) return;
+  if (message.author.bot || processedMessages.has(message.id)) return;  // Avoid bot's own messages and processed messages
+
+  // Mark this message as processed to prevent double handling
+  processedMessages.add(message.id);
 
   // Get the user's language (if applicable)
   const userLang = await getUserLanguage(message.author.id, message.guild.id);
-
+  
+  console.log(`User language detected: ${userLang}`);
+  
   // If the message is in a language other than the default, translate it
   const translatedText = await translateText(message.content, userLang);
 
