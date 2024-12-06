@@ -1,6 +1,7 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
 const axios = require('axios');
+const franc = require('franc-min'); // Language detection library
 
 // Create a new client instance
 const client = new Client({
@@ -18,6 +19,12 @@ const DEFAULT_LANG = 'en'; // Default fallback target language
 function detectLanguage(member) {
     const locale = member.user.locale;
     return locale ? locale.split('-')[0] : DEFAULT_LANG; // Extract "en" from "en-US"
+}
+
+// Function to detect the language of a given text
+function detectMessageLanguage(text) {
+    const lang = franc(text); // Detect language using franc
+    return lang === 'und' ? DEFAULT_LANG : lang; // If undetermined, fallback to default language
 }
 
 // Translation function using MyMemory API
@@ -58,7 +65,7 @@ client.on('messageCreate', async (message) => {
 
     // Detect the target language from the author's settings (system language)
     const targetLang = detectLanguage(message.member) || 'en'; // Fallback to English
-    const sourceLang = 'auto'; // Let the API detect the source language based on the message content
+    const sourceLang = detectMessageLanguage(message.content); // Detect source language from the message content
 
     console.log(`User language detected: ${targetLang}`);
     console.log(`Translating text: ${message.content} from ${sourceLang} to ${targetLang}`);
