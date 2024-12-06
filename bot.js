@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, IntentsBitField, GatewayIntentBits, EmbedBuilder } = require('discord.js');
+const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
 const axios = require('axios');
 
 // Create a new client instance
@@ -21,7 +21,7 @@ function detectLanguage(member) {
 }
 
 // Translation function using MyMemory API
-async function translateText(text, sourceLang, targetLang) {
+async function translateText(text, sourceLang = 'en', targetLang) {
     try {
         const response = await axios.get(API_URL, {
             params: {
@@ -51,13 +51,14 @@ client.on('messageCreate', async (message) => {
     if (message.author.bot) return;
 
     // Detect the target language from the author's settings
-    const targetLang = detectLanguage(message.member);
+    const targetLang = detectLanguage(message.member) || 'en'; // Fallback to English
+    const sourceLang = 'en'; // Set the source language explicitly (adjust if dynamic detection is needed)
 
     console.log(`User language detected: ${targetLang}`);
-    console.log(`Translating text: ${message.content} to ${targetLang}`);
+    console.log(`Translating text: ${message.content} from ${sourceLang} to ${targetLang}`);
 
     // Translate the message
-    const translatedText = await translateText(message.content, 'auto', targetLang);
+    const translatedText = await translateText(message.content, sourceLang, targetLang);
 
     if (translatedText) {
         const embed = new EmbedBuilder()
