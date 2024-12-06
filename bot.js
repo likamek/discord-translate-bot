@@ -23,6 +23,12 @@ function detectLanguage(member) {
 // Translation function using MyMemory API
 async function translateText(text, sourceLang = 'en', targetLang) {
     try {
+        // Ensure the sourceLang and targetLang are distinct
+        if (sourceLang === targetLang) {
+            console.log('Source and target languages are the same, returning original text.');
+            return text; // Return the original text if source and target are the same
+        }
+
         const response = await axios.get(API_URL, {
             params: {
                 q: text,
