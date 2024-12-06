@@ -1,9 +1,18 @@
-require('dotenv').config();  // Load environment variables
+require('dotenv').config();  // Load environment variables from .env
 
 const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
 const axios = require('axios');
 
-// Initialize the client with the necessary intents
+// Fetch the bot token from environment variables
+const token = process.env.BOT_TOKEN;
+
+// Ensure the token is available
+if (!token) {
+  console.error("Bot Token is missing! Please set the BOT_TOKEN environment variable.");
+  process.exit(1);  // Exit if token is missing
+}
+
+// Initialize the Discord client with necessary intents
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -12,14 +21,14 @@ const client = new Client({
   ],
 });
 
-// Print the token to debug
-console.log('Bot Token:', process.env.BOT_TOKEN);
-
 // Your translation API URL
 const API_URL = 'https://translate.argosopentech.com/translate';
 
-// Log in to Discord with your bot's token
-client.login(process.env.BOT_TOKEN);
+// Log the bot token (for debugging, can be removed later)
+console.log("Bot Token:", token);
+
+// Log in to Discord with the bot token
+client.login(token);
 
 // When the bot is ready
 client.once('ready', () => {
@@ -54,7 +63,6 @@ client.on('messageCreate', async (message) => {
 
   // Get the user's language (if applicable)
   const userLang = await getUserLanguage(message.author.id, message.guild.id);
-  console.log(`User's language: ${userLang}`);
 
   // If the message is in a language other than the default, translate it
   const translatedText = await translateText(message.content, userLang);
