@@ -21,9 +21,9 @@ function detectLanguage(member) {
 }
 
 // Translation function using MyMemory API
-async function translateText(text, sourceLang = 'en', targetLang) {
+async function translateText(text, sourceLang, targetLang) {
     try {
-        // Ensure the sourceLang and targetLang are distinct
+        // If source and target languages are the same, don't translate
         if (sourceLang === targetLang) {
             console.log('Source and target languages are the same, returning original text.');
             return text; // Return the original text if source and target are the same
@@ -56,9 +56,9 @@ client.on('messageCreate', async (message) => {
     // Ignore bot messages
     if (message.author.bot) return;
 
-    // Detect the target language from the author's settings
+    // Detect the target language from the author's settings (system language)
     const targetLang = detectLanguage(message.member) || 'en'; // Fallback to English
-    const sourceLang = 'en'; // Set the source language explicitly (adjust if dynamic detection is needed)
+    const sourceLang = 'auto'; // Let the API detect the source language based on the message content
 
     console.log(`User language detected: ${targetLang}`);
     console.log(`Translating text: ${message.content} from ${sourceLang} to ${targetLang}`);
