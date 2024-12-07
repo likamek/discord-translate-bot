@@ -3,7 +3,7 @@ import { Client, GatewayIntentBits, EmbedBuilder } from 'discord.js';
 import axios from 'axios';
 import { franc } from 'franc-min';
 
-dotenv.config();
+dotenv.config(); // Make sure this is only here once
 
 const client = new Client({
     intents: [
@@ -145,7 +145,7 @@ client.once('ready', () => {
 
 // Event handler for message creation
 client.on('messageCreate', async (message) => {
-    // Ignore bot messages
+    // Ignore bot messages and ensure that it reacts only once
     if (message.author.bot) return;
 
     const sourceLang = detectSourceLanguage(message.content);
@@ -161,7 +161,7 @@ client.on('messageCreate', async (message) => {
     if (translatedText) {
         const embed = new EmbedBuilder()
             .setDescription(translatedText) // Only translated text
-            .setColor(0x0099FF); // Simple blue color
+            .setColor(0x0099FF); // Simple blue color, no extra decoration
 
         // Send the translated text as a single embed reply
         message.reply({ embeds: [embed] });
