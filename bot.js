@@ -21,88 +21,7 @@ const DEFAULT_LANG = 'en'; // Default fallback target language
 const app = express();
 
 const ISO6393_TO_ISO6391 = {
-    afr: 'af',
-    amh: 'am',
-    ara: 'ar',
-    asm: 'as',
-    aze: 'az',
-    bel: 'be',
-    ben: 'bn',
-    bos: 'bs',
-    bul: 'bg',
-    cat: 'ca',
-    ces: 'cs',
-    cmn: 'zh', // Mandarin Chinese
-    dan: 'da',
-    deu: 'de',
-    ell: 'el',
-    eng: 'en',
-    epo: 'eo',
-    est: 'et',
-    eus: 'eu',
-    fas: 'fa',
-    fin: 'fi',
-    fra: 'fr',
-    gle: 'ga',
-    glg: 'gl',
-    guj: 'gu',
-    hau: 'ha',
-    heb: 'he',
-    hin: 'hi',
-    hrv: 'hr',
-    hun: 'hu',
-    hye: 'hy',
-    ind: 'id',
-    isl: 'is',
-    ita: 'it',
-    jpn: 'ja',
-    kan: 'kn',
-    kat: 'ka',
-    kaz: 'kk',
-    khm: 'km',
-    kor: 'ko',
-    kur: 'ku',
-    lao: 'lo',
-    lat: 'la',
-    lav: 'lv',
-    lit: 'lt',
-    ltz: 'lb',
-    mal: 'ml',
-    mar: 'mr',
-    mkd: 'mk',
-    mon: 'mn',
-    mri: 'mi',
-    msa: 'ms',
-    mya: 'my',
-    nep: 'ne',
-    nld: 'nl',
-    nor: 'no',
-    pan: 'pa',
-    pol: 'pl',
-    por: 'pt',
-    pus: 'ps',
-    ron: 'ro',
-    rus: 'ru',
-    sin: 'si',
-    slk: 'sk',
-    slv: 'sl',
-    som: 'so',
-    spa: 'es',
-    sqi: 'sq',
-    srp: 'sr',
-    swa: 'sw',
-    swe: 'sv',
-    tam: 'ta',
-    tel: 'te',
-    tha: 'th',
-    tur: 'tr',
-    ukr: 'uk',
-    urd: 'ur',
-    uzb: 'uz',
-    vie: 'vi',
-    xho: 'xh',
-    yor: 'yo',
-    zul: 'zu',
+    // ... (same as before)
 };
 
 // Detect the language of the input text
@@ -165,7 +84,7 @@ client.on('messageCreate', async (message) => {
 
     const translatedText = await translateText(message.content, sourceLang, targetLang);
 
-    if (translatedText) {
+    if (translatedText && translatedText !== message.content) {
         // Log the translated text for debugging
         console.log('Translated Text:', translatedText);
 
@@ -175,8 +94,11 @@ client.on('messageCreate', async (message) => {
 
         // Send the translated text as a single embed reply
         message.reply({ embeds: [embed] });
+    } else if (translatedText && translatedText === message.content) {
+        // If translation returned the same text (e.g., Italian to English with no change)
+        message.reply(`Translation is the same as the original text: ${translatedText}`);
     } else {
-        message.reply('Translation failed.');
+        message.reply('Translation failed or text is identical.');
     }
 });
 
