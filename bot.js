@@ -1,8 +1,7 @@
-
 import dotenv from 'dotenv';
 import { Client, GatewayIntentBits, EmbedBuilder } from 'discord.js';
 import axios from 'axios';
-import franc from 'franc-min';
+import { franc } from 'franc-min';
 
 dotenv.config();
 
