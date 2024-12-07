@@ -94,7 +94,7 @@ client.on('messageCreate', async (message) => {
         console.log('Translated Text:', translatedText);
 
         const embed = new EmbedBuilder()
-            .setColor(0x0099FF)
+            .setColor(0x0099FF) // You can customize the color here
             .setDescription(translatedText);  // Simplified design, no extra background/lines
 
         // Send the translated text as a single embed reply
