@@ -173,3 +173,9 @@ client.on('messageCreate', async (message) => {
 
 // Log in to Discord
 client.login(process.env.BOT_TOKEN);
+
+// Express server to listen on the assigned port
+const port = process.env.PORT || 10000;  // Use the Render-provided port
+app.listen(port, () => {
+    console.log(`Server is listening on port ${port}`);
+});
