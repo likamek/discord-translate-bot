@@ -3,7 +3,7 @@ import { Client, GatewayIntentBits, EmbedBuilder } from 'discord.js';
 import axios from 'axios';
 import { franc } from 'franc-min';
 
-dotenv.config(); // Ensure this is only loaded once
+dotenv.config();
 
 const client = new Client({
     intents: [
@@ -121,6 +121,7 @@ async function translateText(text, sourceLang, targetLang) {
     }
 
     try {
+        // Making the request to the MyMemory API
         const response = await axios.get(API_URL, {
             params: {
                 q: text,
@@ -129,11 +130,16 @@ async function translateText(text, sourceLang, targetLang) {
         });
 
         const translatedText = response.data.responseData.translatedText;
-        if (!translatedText) throw new Error('Translation failed');
+
+        if (!translatedText) {
+            console.error('Translation failed: No translated text found.');
+            return null; // Return null if no translated text is found
+        }
+
         return translatedText;
     } catch (error) {
-        console.error('Error during translation:', error.message || error);
-        return null;
+        console.error('Error during translation:', error.message || error); // Log any error from the request
+        return null; // Return null if there was an error during translation
     }
 }
 
@@ -144,7 +150,7 @@ client.once('ready', () => {
 
 // Event handler for message creation
 client.on('messageCreate', async (message) => {
-    // Ignore bot messages and ensure that it reacts only once
+    // Ignore bot messages
     if (message.author.bot) return;
 
     const sourceLang = detectSourceLanguage(message.content);
@@ -158,12 +164,11 @@ client.on('messageCreate', async (message) => {
     const translatedText = await translateText(message.content, sourceLang, targetLang);
 
     if (translatedText) {
-        // Create a simple embed with just the translated text (transparent background)
         const embed = new EmbedBuilder()
-            .setDescription(translatedText) // Only translated text
-            .setColor(0x000000) // Transparent background, set color to black for simplicity
+            .setColor(0x0099FF)  // Keep it simple with the default color
+            .setDescription(translatedText);  // Only display the translated text, no extra text
 
-        // Send the translated text as a single embed reply (only one embed)
+        // Send the translated text as a single embed reply
         message.reply({ embeds: [embed] });
     } else {
         message.reply('Translation failed.');
