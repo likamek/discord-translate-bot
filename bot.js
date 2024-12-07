@@ -117,7 +117,7 @@ function detectTargetLanguage(member) {
 // Translate text using MyMemory API
 async function translateText(text, sourceLang, targetLang) {
     if (sourceLang === targetLang) {
-        return text; // Ignore translation if source and target are the same
+        return text; // Return the text as-is if source and target are the same
     }
 
     try {
@@ -151,17 +151,21 @@ client.on('messageCreate', async (message) => {
     const sourceLang = detectSourceLanguage(message.content);
     const targetLang = detectTargetLanguage(message.member);
 
-    // If the source and target languages are the same, do nothing
-    if (sourceLang === targetLang) {
-        return; // Just return without doing anything
-    }
+    // If the source and target languages are the same, do nothing (no reply)
+    if (sourceLang === targetLang) return;
 
     console.log(`Translating: "${message.content}" from ${sourceLang} to ${targetLang}`);
 
     const translatedText = await translateText(message.content, sourceLang, targetLang);
 
     if (translatedText) {
-        message.reply(translatedText);
+        const embed = new EmbedBuilder()
+            .setColor(0x0099FF)
+            .setTitle('Translated Text')
+            .setDescription(translatedText);
+
+        // Send the translated text as a single embed reply
+        message.reply({ embeds: [embed] });
     } else {
         message.reply('Translation failed.');
     }
