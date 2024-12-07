@@ -158,10 +158,10 @@ client.on('messageCreate', async (message) => {
     const translatedText = await translateText(message.content, sourceLang, targetLang);
 
     if (translatedText) {
-        // Create a simple embed with just the translated text (no background, no border)
+        // Create a simple embed with just the translated text (transparent background)
         const embed = new EmbedBuilder()
             .setDescription(translatedText) // Only translated text
-            .setColor(0x000000); // No color (black)
+            .setColor(0x000000) // Transparent background, set color to black for simplicity
 
         // Send the translated text as a single embed reply (only one embed)
         message.reply({ embeds: [embed] });
