@@ -117,7 +117,7 @@ function detectTargetLanguage(member) {
 // Translate text using MyMemory API
 async function translateText(text, sourceLang, targetLang) {
     if (sourceLang === targetLang) {
-        return text; // Return the text as-is if source and target are the same
+        return null; // Do nothing if source and target are the same
     }
 
     try {
@@ -160,9 +160,8 @@ client.on('messageCreate', async (message) => {
 
     if (translatedText) {
         const embed = new EmbedBuilder()
-            .setColor(0x0099FF)
-            .setTitle('Translated Text')
-            .setDescription(translatedText);
+            .setDescription(translatedText) // Only translated text
+            .setColor(0x0099FF); // Simple blue color
 
         // Send the translated text as a single embed reply
         message.reply({ embeds: [embed] });
