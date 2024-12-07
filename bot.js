@@ -2,8 +2,21 @@ import dotenv from 'dotenv';
 import { Client, GatewayIntentBits, EmbedBuilder } from 'discord.js';
 import axios from 'axios';
 import { franc } from 'franc-min';
+import express from 'express'; // Import Express
 
 dotenv.config();
+
+const app = express(); // Initialize the express app
+const port = process.env.PORT || 3000; // Use environment variable for port
+
+// Set up a simple route to handle requests
+app.get('/', (req, res) => {
+    res.send('Bot is alive'); // Just a simple response for UptimeRobot ping
+});
+
+app.listen(port, () => {
+    console.log(`Server is listening on port ${port}`);
+});
 
 const client = new Client({
     intents: [
