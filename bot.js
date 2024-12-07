@@ -2,8 +2,10 @@ import dotenv from 'dotenv';
 import { Client, GatewayIntentBits, EmbedBuilder } from 'discord.js';
 import axios from 'axios';
 import { franc } from 'franc-min';
+import express from 'express'; // Make sure express is imported
 
 dotenv.config();
+
 
 const client = new Client({
     intents: [
