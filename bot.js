@@ -2,21 +2,8 @@ import dotenv from 'dotenv';
 import { Client, GatewayIntentBits, EmbedBuilder } from 'discord.js';
 import axios from 'axios';
 import { franc } from 'franc-min';
-import express from 'express'; // Import Express
 
 dotenv.config();
-
-const app = express(); // Initialize the express app
-const port = process.env.PORT || 3000; // Use environment variable for port
-
-// Set up a simple route to handle requests
-app.get('/', (req, res) => {
-    res.send('Bot is alive'); // Just a simple response for UptimeRobot ping
-});
-
-app.listen(port, () => {
-    console.log(`Server is listening on port ${port}`);
-});
 
 const client = new Client({
     intents: [
@@ -130,11 +117,10 @@ function detectTargetLanguage(member) {
 // Translate text using MyMemory API
 async function translateText(text, sourceLang, targetLang) {
     if (sourceLang === targetLang) {
-        return null; // If source and target are the same, no translation
+        return text; // Return the text as-is if source and target are the same
     }
 
     try {
-        // Making the request to the MyMemory API
         const response = await axios.get(API_URL, {
             params: {
                 q: text,
@@ -143,16 +129,12 @@ async function translateText(text, sourceLang, targetLang) {
         });
 
         const translatedText = response.data.responseData.translatedText;
-
-        if (!translatedText) {
-            console.error('Translation failed: No translated text found.');
-            return null; // Return null if no translated text is found
-        }
+        if (!translatedText) throw new Error('Translation failed');
 
         return translatedText;
     } catch (error) {
-        console.error('Error during translation:', error.message || error); // Log any error from the request
-        return null; // Return null if there was an error during translation
+        console.error('Error during translation:', error.message || error);
+        return null;
     }
 }
 
@@ -176,12 +158,11 @@ client.on('messageCreate', async (message) => {
 
     const translatedText = await translateText(message.content, sourceLang, targetLang);
 
+    // Only reply with one embed if translation exists
     if (translatedText) {
         const embed = new EmbedBuilder()
-            .setColor(0x0099FF)  // Keep it simple with the default color
-            .setDescription(translatedText);  // Only display the translated text, no extra text
+            .setDescription(translatedText) // Simplified embed with only the translated text
 
-        // Send the translated text as a single embed reply
         message.reply({ embeds: [embed] });
     } else {
         message.reply('Translation failed.');
