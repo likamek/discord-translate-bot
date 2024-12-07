@@ -1,9 +1,10 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import { Client, GatewayIntentBits, EmbedBuilder } from 'discord.js';
-import franc from 'franc-min';
 import axios from 'axios';
+import { franc } from 'franc-min';
 
-// Create a new Discord client instance
+dotenv.config();
+
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -14,7 +15,6 @@ const client = new Client({
 
 const API_URL = 'https://api.mymemory.translated.net/get';
 const DEFAULT_LANG = 'en'; // Default fallback target language
-
 
 // Full ISO-639-3 to ISO-639-1 mapping
 const ISO6393_TO_ISO6391 = {
@@ -113,7 +113,6 @@ function detectTargetLanguage(member) {
     const locale = member?.user?.locale;
     return locale ? locale.split('-')[0] : DEFAULT_LANG;
 }
-
 // Translate text using MyMemory API
 async function translateText(text, sourceLang, targetLang) {
     if (sourceLang === targetLang) {
@@ -158,7 +157,7 @@ client.on('messageCreate', async (message) => {
     if (translatedText) {
         message.reply(translatedText);
     } else {
-        message.reply('❌ Translation failed.');
+        message.reply('Translation failed.');
     }
 });
 
