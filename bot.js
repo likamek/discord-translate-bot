@@ -1,10 +1,9 @@
-import dotenv from 'dotenv';
-import { Client, GatewayIntentBits } from 'discord.js';
+import 'dotenv/config';
+import { Client, GatewayIntentBits, EmbedBuilder } from 'discord.js';
+import franc from 'franc-min';
 import axios from 'axios';
-import { franc } from 'franc-min';
 
-dotenv.config();
-
+// Create a new Discord client instance
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -15,6 +14,7 @@ const client = new Client({
 
 const API_URL = 'https://api.mymemory.translated.net/get';
 const DEFAULT_LANG = 'en'; // Default fallback target language
+
 
 // Full ISO-639-3 to ISO-639-1 mapping
 const ISO6393_TO_ISO6391 = {
@@ -102,14 +102,24 @@ const ISO6393_TO_ISO6391 = {
     zul: 'zu',
 };
 
-// Function to detect message language
-function detectLanguage(text) {
-    const detectedISO6393 = franc(text);
-    return ISO6393_TO_ISO6391[detectedISO6393] || DEFAULT_LANG;
+// Detect the language of the input text
+function detectSourceLanguage(text) {
+    const lang = franc(text);
+    return ISO6393_TO_ISO6391[lang] || DEFAULT_LANG;
 }
 
-// Translation function using MyMemory API
+// Detect the preferred language of the user
+function detectTargetLanguage(member) {
+    const locale = member?.user?.locale;
+    return locale ? locale.split('-')[0] : DEFAULT_LANG;
+}
+
+// Translate text using MyMemory API
 async function translateText(text, sourceLang, targetLang) {
+    if (sourceLang === targetLang) {
+        return text; // Ignore translation if source and target are the same
+    }
+
     try {
         const response = await axios.get(API_URL, {
             params: {
@@ -128,25 +138,27 @@ async function translateText(text, sourceLang, targetLang) {
     }
 }
 
-// Event handler when bot is ready
+// Event handler when the bot is ready
 client.once('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
 // Event handler for message creation
 client.on('messageCreate', async (message) => {
+    // Ignore bot messages
     if (message.author.bot) return;
 
-    const sourceLang = detectLanguage(message.content);
-    const targetLang = message.guild?.preferredLocale?.split('-')[0] || DEFAULT_LANG;
+    const sourceLang = detectSourceLanguage(message.content);
+    const targetLang = detectTargetLanguage(message.member);
 
     console.log(`Translating: "${message.content}" from ${sourceLang} to ${targetLang}`);
 
     const translatedText = await translateText(message.content, sourceLang, targetLang);
+
     if (translatedText) {
         message.reply(translatedText);
     } else {
-        message.reply('Failed to translate the message.');
+        message.reply('❌ Translation failed.');
     }
 });
 
