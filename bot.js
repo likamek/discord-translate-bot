@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import { Client, GatewayIntentBits, EmbedBuilder } from 'discord.js';
 import axios from 'axios';
 import { franc } from 'franc-min';
-import express from 'express'; // Ensure express is imported
+import express from 'express';
 
 dotenv.config();
 
@@ -17,10 +17,9 @@ const client = new Client({
 const API_URL = 'https://api.mymemory.translated.net/get';
 const DEFAULT_LANG = 'en'; // Default fallback target language
 
-// Initialize express
-const app = express();  // Initialize the express app here
+// Initialize express app
+const app = express();
 
-// Full ISO-639-3 to ISO-639-1 mapping
 const ISO6393_TO_ISO6391 = {
     afr: 'af',
     amh: 'am',
@@ -132,6 +131,8 @@ async function translateText(text, sourceLang, targetLang) {
             },
         });
 
+        console.log('API Response:', response.data); // Log the API response for debugging
+
         const translatedText = response.data.responseData.translatedText;
         if (!translatedText) throw new Error('Translation failed');
 
@@ -155,14 +156,19 @@ client.on('messageCreate', async (message) => {
     const sourceLang = detectSourceLanguage(message.content);
     const targetLang = detectTargetLanguage(message.member);
 
+    // Log the detected languages for debugging
+    console.log(`Detected Source Language: ${sourceLang}`);
+    console.log(`Detected Target Language: ${targetLang}`);
+
     // If the source and target languages are the same, do nothing (no reply)
     if (sourceLang === targetLang) return;
-
-    console.log(`Translating: "${message.content}" from ${sourceLang} to ${targetLang}`);
 
     const translatedText = await translateText(message.content, sourceLang, targetLang);
 
     if (translatedText) {
+        // Log the translated text for debugging
+        console.log('Translated Text:', translatedText);
+
         const embed = new EmbedBuilder()
             .setColor(0x0099FF)
             .setDescription(translatedText);  // Simplified design, no extra background/lines
