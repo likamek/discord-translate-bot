@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import { Client, GatewayIntentBits, EmbedBuilder } from 'discord.js';
 import axios from 'axios';
 import { franc } from 'franc-min';
+import express from 'express';
 
 dotenv.config();
 
@@ -141,6 +142,20 @@ async function translateText(text, sourceLang, targetLang) {
 // Event handler when the bot is ready
 client.once('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
+
+    // Set up Express to keep the web service alive
+    const app = express();
+    const PORT = process.env.PORT || 3000;
+
+    // Simple route to keep the web service alive
+    app.get('/', (req, res) => {
+        res.send('Bot is running!');
+    });
+
+    // Listen on the specified port
+    app.listen(PORT, () => {
+        console.log(`Server is listening on port ${PORT}`);
+    });
 });
 
 // Event handler for message creation
