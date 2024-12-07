@@ -3,7 +3,7 @@ import { Client, GatewayIntentBits, EmbedBuilder } from 'discord.js';
 import axios from 'axios';
 import { franc } from 'franc-min';
 
-dotenv.config(); // Make sure this is only here once
+dotenv.config(); // Ensure this is only loaded once
 
 const client = new Client({
     intents: [
@@ -117,7 +117,7 @@ function detectTargetLanguage(member) {
 // Translate text using MyMemory API
 async function translateText(text, sourceLang, targetLang) {
     if (sourceLang === targetLang) {
-        return null; // Do nothing if source and target are the same
+        return null; // If source and target are the same, no translation
     }
 
     try {
@@ -130,7 +130,6 @@ async function translateText(text, sourceLang, targetLang) {
 
         const translatedText = response.data.responseData.translatedText;
         if (!translatedText) throw new Error('Translation failed');
-
         return translatedText;
     } catch (error) {
         console.error('Error during translation:', error.message || error);
@@ -159,10 +158,10 @@ client.on('messageCreate', async (message) => {
     const translatedText = await translateText(message.content, sourceLang, targetLang);
 
     if (translatedText) {
-        // Create a simple embed with just the translated text
+        // Create a simple embed with just the translated text (no background, no border)
         const embed = new EmbedBuilder()
             .setDescription(translatedText) // Only translated text
-            .setColor(0xFFFFFF); // White color for simplicity (no extra styling)
+            .setColor(0x000000); // No color (black)
 
         // Send the translated text as a single embed reply (only one embed)
         message.reply({ embeds: [embed] });
