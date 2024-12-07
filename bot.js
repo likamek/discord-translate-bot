@@ -116,7 +116,7 @@ function detectTargetLanguage(member) {
 // Translate text using MyMemory API
 async function translateText(text, sourceLang, targetLang) {
     if (sourceLang === targetLang) {
-        return text; // Ignore translation if source and target are the same
+        return null; // Ignore translation if source and target are the same
     }
 
     try {
