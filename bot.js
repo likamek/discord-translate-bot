@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { Client, GatewayIntentBits, EmbedBuilder } from 'discord.js';
+import { Client, GatewayIntentBits } from 'discord.js';
 import axios from 'axios';
 import { franc } from 'franc-min';
 
@@ -16,10 +16,12 @@ const client = new Client({
 const API_URL = 'https://api.mymemory.translated.net/get';
 const DEFAULT_LANG = 'en'; // Default fallback target language
 
-const iso6393ToIso6391 = {
+// Full ISO-639-3 to ISO-639-1 mapping
+const ISO6393_TO_ISO6391 = {
     afr: 'af',
     amh: 'am',
     ara: 'ar',
+    asm: 'as',
     aze: 'az',
     bel: 'be',
     ben: 'bn',
@@ -27,8 +29,7 @@ const iso6393ToIso6391 = {
     bul: 'bg',
     cat: 'ca',
     ces: 'cs',
-    cmn: 'zh',
-    cym: 'cy',
+    cmn: 'zh', // Mandarin Chinese
     dan: 'da',
     deu: 'de',
     ell: 'el',
@@ -52,11 +53,12 @@ const iso6393ToIso6391 = {
     isl: 'is',
     ita: 'it',
     jpn: 'ja',
+    kan: 'kn',
     kat: 'ka',
     kaz: 'kk',
     khm: 'km',
-    kin: 'rw',
     kor: 'ko',
+    kur: 'ku',
     lao: 'lo',
     lat: 'la',
     lav: 'lv',
@@ -66,15 +68,16 @@ const iso6393ToIso6391 = {
     mar: 'mr',
     mkd: 'mk',
     mon: 'mn',
+    mri: 'mi',
     msa: 'ms',
     mya: 'my',
     nep: 'ne',
     nld: 'nl',
     nor: 'no',
-    orm: 'om',
     pan: 'pa',
     pol: 'pl',
     por: 'pt',
+    pus: 'ps',
     ron: 'ro',
     rus: 'ru',
     sin: 'si',
@@ -82,7 +85,9 @@ const iso6393ToIso6391 = {
     slv: 'sl',
     som: 'so',
     spa: 'es',
+    sqi: 'sq',
     srp: 'sr',
+    swa: 'sw',
     swe: 'sv',
     tam: 'ta',
     tel: 'te',
@@ -94,10 +99,8 @@ const iso6393ToIso6391 = {
     vie: 'vi',
     xho: 'xh',
     yor: 'yo',
-    zho: 'zh',
     zul: 'zu',
 };
-
 
 // Function to detect message language
 function detectLanguage(text) {
@@ -135,7 +138,7 @@ client.on('messageCreate', async (message) => {
     if (message.author.bot) return;
 
     const sourceLang = detectLanguage(message.content);
-    const targetLang = message.guild?.preferredLocale || DEFAULT_LANG;
+    const targetLang = message.guild?.preferredLocale?.split('-')[0] || DEFAULT_LANG;
 
     console.log(`Translating: "${message.content}" from ${sourceLang} to ${targetLang}`);
 
@@ -143,7 +146,7 @@ client.on('messageCreate', async (message) => {
     if (translatedText) {
         message.reply(translatedText);
     } else {
-        message.reply('❌ Failed to translate the message.');
+        message.reply('Failed to translate the message.');
     }
 });
 
