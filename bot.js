@@ -26,6 +26,11 @@ const ISO6393_TO_ISO6391 = {
 
 // Detect the language of the input text
 function detectSourceLanguage(text) {
+    // Check if the text contains Hebrew or other RTL languages manually
+    if (/[\u0590-\u05FF]/.test(text)) {
+        return 'he';  // Hebrew detected
+    }
+    
     const lang = franc(text);
     return ISO6393_TO_ISO6391[lang] || DEFAULT_LANG;
 }
@@ -95,7 +100,7 @@ client.on('messageCreate', async (message) => {
         // Send the translated text as a single embed reply
         message.reply({ embeds: [embed] });
     } else if (translatedText && translatedText === message.content) {
-        // If translation returned the same text (e.g., Italian to English with no change)
+        // If translation returned the same text (e.g., Hebrew or same text)
         message.reply(`Translation is the same as the original text: ${translatedText}`);
     } else {
         message.reply('Translation failed or text is identical.');
