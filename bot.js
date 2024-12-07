@@ -113,6 +113,7 @@ function detectTargetLanguage(member) {
     const locale = member?.user?.locale;
     return locale ? locale.split('-')[0] : DEFAULT_LANG;
 }
+
 // Translate text using MyMemory API
 async function translateText(text, sourceLang, targetLang) {
     if (sourceLang === targetLang) {
@@ -149,6 +150,11 @@ client.on('messageCreate', async (message) => {
 
     const sourceLang = detectSourceLanguage(message.content);
     const targetLang = detectTargetLanguage(message.member);
+
+    // If the source and target languages are the same, do nothing
+    if (sourceLang === targetLang) {
+        return; // Just return without doing anything
+    }
 
     console.log(`Translating: "${message.content}" from ${sourceLang} to ${targetLang}`);
 
