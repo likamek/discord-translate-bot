@@ -174,11 +174,6 @@ const ISO6393_TO_ISO6391 = {
 
 // Detect the language of the input text
 function detectSourceLanguage(text) {
-    // Check if the text contains Hebrew or other RTL languages manually
-    if (/[\u0590-\u05FF]/.test(text)) {
-        return 'he';  // Hebrew detected
-    }
-    
     const lang = franc(text);
     return ISO6393_TO_ISO6391[lang] || DEFAULT_LANG;
 }
@@ -192,7 +187,7 @@ function detectTargetLanguage(member) {
 // Translate text using MyMemory API
 async function translateText(text, sourceLang, targetLang) {
     if (sourceLang === targetLang) {
-        return text; // Return the text as-is if source and target are the same
+        return text; // Ignore translation if source and target are the same
     }
 
     try {
@@ -202,8 +197,6 @@ async function translateText(text, sourceLang, targetLang) {
                 langpair: `${sourceLang}|${targetLang}`,
             },
         });
-
-        console.log('API Response:', response.data); // Log the API response for debugging
 
         const translatedText = response.data.responseData.translatedText;
         if (!translatedText) throw new Error('Translation failed');
@@ -228,30 +221,19 @@ client.on('messageCreate', async (message) => {
     const sourceLang = detectSourceLanguage(message.content);
     const targetLang = detectTargetLanguage(message.member);
 
-    // Log the detected languages for debugging
-    console.log(`Detected Source Language: ${sourceLang}`);
-    console.log(`Detected Target Language: ${targetLang}`);
+    // If the source and target languages are the same, do nothing
+    if (sourceLang === targetLang) {
+        return; // Just return without doing anything
+    }
 
-    // If the source and target languages are the same, do nothing (no reply)
-    if (sourceLang === targetLang) return;
+    console.log(`Translating: "${message.content}" from ${sourceLang} to ${targetLang}`);
 
     const translatedText = await translateText(message.content, sourceLang, targetLang);
 
-    if (translatedText && translatedText !== message.content) {
-        // Log the translated text for debugging
-        console.log('Translated Text:', translatedText);
-
-        const embed = new EmbedBuilder()
-            .setColor(0x0099FF)
-            .setDescription(translatedText);  // Simplified design, no extra background/lines
-
-        // Send the translated text as a single embed reply
-        message.reply({ embeds: [embed] });
-    } else if (translatedText && translatedText === message.content) {
-        // If translation returned the same text (e.g., Hebrew or same text)
-        message.reply(`Translation is the same as the original text: ${translatedText}`);
+    if (translatedText) {
+        message.reply(translatedText);
     } else {
-        message.reply('Translation failed or text is identical.');
+        message.reply('Translation failed.');
     }
 });
 
