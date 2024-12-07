@@ -1,7 +1,9 @@
-require('dotenv').config();
-const { Client, GatewayIntentBits } = require('discord.js');
-const axios = require('axios');
-const franc = require('franc-min');
+import dotenv from 'dotenv';
+import { Client, GatewayIntentBits } from 'discord.js';
+import axios from 'axios';
+import { franc } from 'franc-min';
+
+dotenv.config();
 
 // Create a new client instance
 const client = new Client({
