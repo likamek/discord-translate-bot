@@ -159,11 +159,12 @@ client.on('messageCreate', async (message) => {
     const translatedText = await translateText(message.content, sourceLang, targetLang);
 
     if (translatedText) {
+        // Create a simple embed with just the translated text
         const embed = new EmbedBuilder()
             .setDescription(translatedText) // Only translated text
-            .setColor(0x0099FF); // Simple blue color, no extra decoration
+            .setColor(0xFFFFFF); // White color for simplicity (no extra styling)
 
-        // Send the translated text as a single embed reply
+        // Send the translated text as a single embed reply (only one embed)
         message.reply({ embeds: [embed] });
     } else {
         message.reply('Translation failed.');
