@@ -3,6 +3,7 @@ import { Client, GatewayIntentBits } from 'discord.js';
 import axios from 'axios';
 import { franc } from 'franc-min';
 import express from 'express'; // Import Express
+
 dotenv.config();
 
 const client = new Client({
@@ -11,6 +12,7 @@ const client = new Client({
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildMembers, // Make sure GuildMembers intent is included
+        GatewayIntentBits.MessageReactions, // Required for message reactions
     ],
 });
 
@@ -50,11 +52,10 @@ async function translateText(text, sourceLang, targetLang) {
 
 // Event handler for reactions added to messages
 client.on('messageReactionAdd', async (reaction, user) => {
+    console.log(`Reaction added: ${reaction.emoji.name} by user ${user.tag}`); // Log the reaction emoji and the user who reacted
+
     // Ignore reactions from bots
     if (user.bot) return;
-
-    // Log the reaction emoji and the user who reacted
-    console.log(`Reaction added: ${reaction.emoji.name} by user ${user.tag}`);
 
     // Check if the emoji is the one we want (💭 in this case)
     if (reaction.emoji.name !== TRANSLATE_EMOJI) return;
@@ -100,7 +101,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
 });
 
-
 // Set up an Express server to keep the bot alive and listen on a port
 const app = express();
 
@@ -115,7 +115,5 @@ app.listen(port, () => {
     console.log(`Server is listening on port ${port}`);
 });
 
-// Log in to Discord
-client.login(process.env.BOT_TOKEN);
 // Log in to Discord
 client.login(process.env.BOT_TOKEN);
