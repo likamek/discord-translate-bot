@@ -10,9 +10,10 @@ const client = new Client({
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
-        GatewayIntentBits.MessageReactions, // Add this to track reactions
+        GatewayIntentBits.GuildMembers, // Make sure GuildMembers intent is included
     ],
 });
+
 
 const API_URL = 'https://api.mymemory.translated.net/get';
 const DEFAULT_LANG = 'en'; // Default fallback target language
