@@ -50,14 +50,16 @@ async function translateText(text, sourceLang, targetLang) {
 
 // Event handler for reactions added to messages
 client.on('messageReactionAdd', async (reaction, user) => {
+    console.log('Emoji name:', reaction.emoji.name); // This will log the emoji name
+    
     // Ignore reactions from bots
     if (user.bot) return;
 
+    // Check if it's the translate emoji (💭 in your case)
+    if (reaction.emoji.name !== '💭') return; // Check for the translate emoji once
+
     // Log the reaction emoji and the user who reacted
     console.log(`Reaction added: ${reaction.emoji.name} by user ${user.tag}`);
-
-    // Check if the emoji is the one we want (💭 in this case)
-    if (reaction.emoji.name !== TRANSLATE_EMOJI) return;
 
     // Get the message that was reacted to
     const message = reaction.message;
@@ -99,6 +101,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         console.error('Error fetching member data:', error.message);
     }
 });
+
 
 
 const app = express();
