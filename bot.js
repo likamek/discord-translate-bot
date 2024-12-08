@@ -115,4 +115,4 @@ app.listen(port, () => {
 });
 
 // Log in to Discord
-client.login(process.env.BOT_TOKEN);
+client.login(process.env.BOT_TOKEN);  // Make sure the token is correct
