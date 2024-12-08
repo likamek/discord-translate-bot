@@ -20,7 +20,7 @@ console.log("Bot intents:", client.options.intents); // Debugging: log intents
 
 const API_URL = 'https://api.mymemory.translated.net/get';
 const DEFAULT_LANG = 'en'; // Default fallback target language
-const TRANSLATE_EMOJI = '💭'; // Discord thought balloon emoji :thought_balloon:
+const TRANSLATE_EMOJI = 'thought_balloon'; // Discord thought balloon emoji :thought_balloon:
 
 function detectLanguage(text) {
     const lang = franc(text);
