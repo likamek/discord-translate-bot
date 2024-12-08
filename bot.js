@@ -175,6 +175,10 @@ const ISO6393_TO_ISO6391 = {
 // Detect the language of the input text
 function detectSourceLanguage(text) {
     const lang = franc(text);
+    if (lang === 'und') {
+        console.log('Language detection failed. Defaulting to English.');
+        return DEFAULT_LANG;
+    }
     return ISO6393_TO_ISO6391[lang] || DEFAULT_LANG;
 }
 
@@ -198,13 +202,14 @@ async function translateText(text, sourceLang, targetLang) {
             },
         });
 
+        console.log('Translation API response:', response.data);
         const translatedText = response.data.responseData.translatedText;
         if (!translatedText) throw new Error('Translation failed');
 
         return translatedText;
     } catch (error) {
         console.error('Error during translation:', error.message || error);
-        return null;
+        return 'Error: Unable to translate your message.';
     }
 }
 
@@ -218,22 +223,22 @@ client.on('messageCreate', async (message) => {
     // Ignore bot messages
     if (message.author.bot) return;
 
-    const sourceLang = detectSourceLanguage(message.content);
-    const targetLang = detectTargetLanguage(message.member);
+    try {
+        const sourceLang = detectSourceLanguage(message.content);
+        const targetLang = detectTargetLanguage(message.member);
 
-    // If the source and target languages are the same, do nothing
-    if (sourceLang === targetLang) {
-        return; // Just return without doing anything
-    }
+        console.log(`Detected languages: source=${sourceLang}, target=${targetLang}`);
 
-    console.log(`Translating: "${message.content}" from ${sourceLang} to ${targetLang}`);
+        if (sourceLang === targetLang) {
+            console.log('Source and target languages are the same. Skipping.');
+            return;
+        }
 
-    const translatedText = await translateText(message.content, sourceLang, targetLang);
-
-    if (translatedText) {
+        const translatedText = await translateText(message.content, sourceLang, targetLang);
         message.reply(translatedText);
-    } else {
-        message.reply('Translation failed.');
+    } catch (err) {
+        console.error('Error handling message:', err);
+        message.reply('Oops, something went wrong while processing your request.');
     }
 });
 
