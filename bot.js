@@ -16,10 +16,6 @@ const client = new Client({
 const API_URL = 'https://api.mymemory.translated.net/get';
 const DEFAULT_LANG = 'en'; // Default fallback target language
 
-const API_URL = 'https://api.mymemory.translated.net/get';
-const DEFAULT_LANG = 'en'; // Default fallback target language
-
-
 // Map of ISO6393 to ISO6391 codes (simplified for common languages)
 const ISO6393_TO_ISO6391 = {
     'abk': 'ab',  // Abkhazian
