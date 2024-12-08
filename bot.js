@@ -11,8 +11,8 @@ const client = new Client({
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildMembers, // Make sure GuildMembers intent is included
-        GatewayIntentBits.MessageReactions, // Required for message reactions
+        GatewayIntentBits.GuildMembers,  // Required for fetching members
+        GatewayIntentBits.MessageReactions,  // Required for reactions
     ],
 });
 
