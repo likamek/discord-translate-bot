@@ -1,18 +1,18 @@
 import dotenv from 'dotenv';
-import { Client, GatewayIntentBits } from 'discord.js';
+import { Client, GatewayIntentBits } from 'discord.js'; // Importing the correct Intent bits
 import axios from 'axios';
 import { franc } from 'franc-min';
 import express from 'express'; // Import Express
 dotenv.config();
 
-// Ensure correct intents are set
+// Initialize the client with correct intents
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildMembers, // GuildMembers intent is essential for fetching members
-        GatewayIntentBits.Reactions, // Added reaction intent to detect reactions
+        GatewayIntentBits.GuildMembers, // Important: GuildMembers Intent
+        GatewayIntentBits.MessageReactions, // Reactions Intent (add this one)
     ],
 });
 
