@@ -1,17 +1,18 @@
 import dotenv from 'dotenv';
-import { Client, GatewayIntentBits } from 'discord.js'; // Correct import
+import { Client, GatewayIntentBits, IntentsBitField } from 'discord.js'; // Correct import
 import axios from 'axios';
 import { franc } from 'franc-min';
 import express from 'express'; // Import Express
 dotenv.config();
 
+// Correctly define the intents using IntentsBitField.Flags
 const client = new Client({
     intents: [
-        GatewayIntentBits.Guilds,           // To receive events about guilds
-        GatewayIntentBits.GuildMessages,    // To receive events about messages in a guild
-        GatewayIntentBits.MessageContent,   // To read the content of messages (required for message reaction)
-        GatewayIntentBits.GuildMembers,     // To fetch member information (required for reacting members)
-        GatewayIntentBits.MessageReactions, // To listen for message reactions
+        IntentsBitField.Flags.Guilds,             // For general guild events
+        IntentsBitField.Flags.GuildMessages,      // To read messages
+        IntentsBitField.Flags.MessageContent,     // To read the content of messages
+        IntentsBitField.Flags.GuildMembers,       // For member data
+        IntentsBitField.Flags.MessageReactions,   // For listening to reactions
     ],
 });
 
