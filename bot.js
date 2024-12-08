@@ -8,11 +8,10 @@ dotenv.config();
 
 const client = new Client({
     intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildMembers, // Make sure GuildMembers intent is included
-        GatewayIntentBits.MessageReactions, // Required for message reactions
+        GatewayIntentBits.Guilds,              // Required to interact with guilds
+        GatewayIntentBits.GuildMessages,       // Required to read messages from guilds
+        GatewayIntentBits.MessageContent,      // Required to read the content of messages
+        GatewayIntentBits.GuildMembers,        // Required to access guild member events (if needed)
     ],
 });
 
