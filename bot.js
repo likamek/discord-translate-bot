@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { Client, GatewayIntentBits, IntentsBitField } from 'discord.js'; // Import IntentsBitField from discord.js
+import { Client, GatewayIntentBits } from 'discord.js';
 import axios from 'axios';
 import { franc } from 'franc-min';
 import express from 'express'; // Import Express
@@ -7,11 +7,10 @@ dotenv.config();
 
 const client = new Client({
     intents: [
-        GatewayIntentBits.Guilds,             // For general guild events
-        GatewayIntentBits.GuildMessages,      // To read messages
-        GatewayIntentBits.MessageContent,     // To read the content of messages
-        GatewayIntentBits.GuildMembers,       // For member data
-        GatewayIntentBits.MessageReactions,   // For listening to reactions
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildMembers, // Make sure GuildMembers intent is included
     ],
 });
 
