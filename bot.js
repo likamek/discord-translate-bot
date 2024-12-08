@@ -5,15 +5,15 @@ import { franc } from 'franc-min';
 import express from 'express'; // Import Express
 dotenv.config();
 
+// Ensure correct intents are set
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildMembers, // Make sure GuildMembers intent is included
+        GatewayIntentBits.GuildMembers, // GuildMembers intent is essential for fetching members
     ],
 });
-
 
 const API_URL = 'https://api.mymemory.translated.net/get';
 const DEFAULT_LANG = 'en'; // Default fallback target language
@@ -22,7 +22,7 @@ const TRANSLATE_EMOJI = '💭'; // Discord thought balloon emoji :thought_balloo
 // Detect language logic remains the same
 function detectLanguage(text) {
     const lang = franc(text);
-    return ISO6393_TO_ISO6391[lang] || DEFAULT_LANG;
+    return lang || DEFAULT_LANG; // Return detected language or fallback to default if undetected
 }
 
 // Translate text using MyMemory API
@@ -61,22 +61,27 @@ client.on('messageReactionAdd', async (reaction, user) => {
     // Detect the language of the message
     const sourceLang = detectLanguage(message.content);
 
-    const member = await message.guild.members.fetch(user.id);
-    const targetLang = member.user.locale.split('-')[0] || DEFAULT_LANG; // Detect user's system language (fallback to default if not set)
-
-    // Translate the message
-    const translatedText = await translateText(message.content, sourceLang, targetLang);
-
-    if (!translatedText) return;
-
-    // Send the translation as an ephemeral message (visible only to the user who reacted)
+    // Add try-catch around member fetching and handle timeout gracefully
     try {
-        await message.reply({
-            content: translatedText,
-            ephemeral: true, // Makes the message ephemeral
-        });
-    } catch (err) {
-        console.error('Error sending translation:', err);
+        const member = await message.guild.members.fetch(user.id, { cache: true, timeout: 5000 }); // Added timeout (in ms)
+        const targetLang = member.user.locale.split('-')[0] || DEFAULT_LANG; // Detect user's system language (fallback to default if not set)
+
+        // Translate the message
+        const translatedText = await translateText(message.content, sourceLang, targetLang);
+
+        if (!translatedText) return;
+
+        // Send the translation as an ephemeral message (visible only to the user who reacted)
+        try {
+            await message.reply({
+                content: translatedText,
+                ephemeral: true, // Makes the message ephemeral
+            });
+        } catch (err) {
+            console.error('Error sending translation:', err);
+        }
+    } catch (error) {
+        console.error('Error fetching member data:', error.message);
     }
 });
 
