@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import { Client, GatewayIntentBits } from 'discord.js';
 import axios from 'axios';
 import { franc } from 'franc-min';
-import express from 'express'; // Import Express
+import express from 'express';
 
 dotenv.config();
 
@@ -11,8 +11,8 @@ const client = new Client({
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildMembers,  // Required for fetching members
-        GatewayIntentBits.MessageReactions,  // Required for reactions
+        GatewayIntentBits.GuildMembers, // Make sure GuildMembers intent is included
+        GatewayIntentBits.MessageReactions, // Required for message reactions
     ],
 });
 
