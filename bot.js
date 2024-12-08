@@ -175,17 +175,20 @@ const ISO6393_TO_ISO6391 = {
 // Detect the language of the input text
 function detectSourceLanguage(text) {
     const lang = franc(text);
-    if (lang === 'und') {
-        console.log('Language detection failed. Defaulting to English.');
-        return DEFAULT_LANG;
-    }
     return ISO6393_TO_ISO6391[lang] || DEFAULT_LANG;
 }
 
-// Detect the preferred language of the user
+// Detect the preferred language of the user based on nickname or fallback
 function detectTargetLanguage(member) {
-    const locale = member?.user?.locale;
-    return locale ? locale.split('-')[0] : DEFAULT_LANG;
+    // Example: Detect language tag from nickname (e.g., [fr] John Doe)
+    const nickname = member?.nickname || member?.user?.username;
+    const match = nickname?.match(/\[(\w{2})\]/); // Matches [fr], [es], etc.
+    if (match) {
+        return match[1];
+    }
+
+    // Fallback to default language
+    return DEFAULT_LANG;
 }
 
 // Translate text using MyMemory API
@@ -202,14 +205,13 @@ async function translateText(text, sourceLang, targetLang) {
             },
         });
 
-        console.log('Translation API response:', response.data);
         const translatedText = response.data.responseData.translatedText;
         if (!translatedText) throw new Error('Translation failed');
 
         return translatedText;
     } catch (error) {
         console.error('Error during translation:', error.message || error);
-        return 'Error: Unable to translate your message.';
+        return null;
     }
 }
 
@@ -223,22 +225,22 @@ client.on('messageCreate', async (message) => {
     // Ignore bot messages
     if (message.author.bot) return;
 
-    try {
-        const sourceLang = detectSourceLanguage(message.content);
-        const targetLang = detectTargetLanguage(message.member);
+    const sourceLang = detectSourceLanguage(message.content);
+    const targetLang = detectTargetLanguage(message.member);
 
-        console.log(`Detected languages: source=${sourceLang}, target=${targetLang}`);
+    // If the source and target languages are the same, do nothing
+    if (sourceLang === targetLang) {
+        return; // Just return without doing anything
+    }
 
-        if (sourceLang === targetLang) {
-            console.log('Source and target languages are the same. Skipping.');
-            return;
-        }
+    console.log(`Translating: "${message.content}" from ${sourceLang} to ${targetLang}`);
 
-        const translatedText = await translateText(message.content, sourceLang, targetLang);
+    const translatedText = await translateText(message.content, sourceLang, targetLang);
+
+    if (translatedText) {
         message.reply(translatedText);
-    } catch (err) {
-        console.error('Error handling message:', err);
-        message.reply('Oops, something went wrong while processing your request.');
+    } else {
+        message.reply('Translation failed.');
     }
 });
 
