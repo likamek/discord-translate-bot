@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { Client, GatewayIntentBits, IntentsBitField } from 'discord.js'; // Correct import
+import { Client, GatewayIntentBits, IntentsBitField } from 'discord.js'; // Correct import of IntentsBitField
 import axios from 'axios';
 import { franc } from 'franc-min';
 import express from 'express'; // Import Express
