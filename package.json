@@ -11,11 +11,16 @@
     "node": "18.x"
   },
   "dependencies": {
+    "adm-zip": "^0.5.16",
     "axios": "^1.7.9",
     "discord.js": "^14.16.3",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "franc-min": "^6.2.0",
-    "openai": "^4.76.0"
+    "fs": "^0.0.1-security",
+    "node-record-lpcm16": "^1.0.1",
+    "openai": "^4.76.0",
+    "python-shell": "^5.0.0",
+    "unzipper": "^0.12.3"
   }
 }
