@@ -5,6 +5,10 @@ import express from 'express';
 
 dotenv.config();
 console.log("Starting bot...");
+if (!process.env.OPENAI_API_KEY || !process.env.BOT_TOKEN) {
+    console.error("Missing environment variables. Please set OPENAI_API_KEY and BOT_TOKEN.");
+    process.exit(1);  // Exit the program if the required keys are missing
+}
 
 const client = new Client({
     intents: [
@@ -27,9 +31,42 @@ const openai = new OpenAI({
 const DEFAULT_LANG = 'en'; // Default language
 const TRANSLATE_EMOJI = '💭'; // Thought balloon emoji
 
-// Override and Ignore language lists
-const IGNORED_LANGUAGES = ['fr', 'de'];  // Add any languages you want to ignore
-let userLanguages = {}; // Stores user language preferences
+let userLanguages = {};  // Stores user language preferences
+let userIgnoredLanguages = {}; // Stores ignored languages for each user
+
+// Listen for the '/ignore' command to allow users to ignore certain languages
+client.on('messageCreate', async (message) => {
+    if (message.content.startsWith('/ignore')) {
+        const args = message.content.split(' ');
+        const languageToIgnore = args[1]; // The language the user wants to ignore
+
+        if (languageToIgnore) {
+            // Add language to the user's ignored languages list
+            if (!userIgnoredLanguages[message.author.id]) {
+                userIgnoredLanguages[message.author.id] = [];
+            }
+            userIgnoredLanguages[message.author.id].push(languageToIgnore);
+            message.reply(`You will no longer receive translations for ${languageToIgnore}.`);
+        } else {
+            message.reply('Please specify a language code to ignore.');
+        }
+    }
+});
+
+// Listen for the '/language' command to allow users to set their preferred language
+client.on('messageCreate', async (message) => {
+    if (message.content.startsWith('/language')) {
+        const args = message.content.split(' ');
+        const newLanguage = args[1]; // The language the user wants to set
+
+        if (newLanguage) {
+            userLanguages[message.author.id] = newLanguage; // Set the user's new preferred language
+            message.reply(`Your preferred language has been set to ${newLanguage}.`);
+        } else {
+            message.reply('Please specify a language code to set as your preferred language.');
+        }
+    }
+});
 
 async function translateText(text, sourceLang, targetLang) {
     if (sourceLang === targetLang) {
@@ -93,9 +130,9 @@ client.on('messageReactionAdd', async (reaction, user) => {
         console.log(`User ${user.tag} has an override language set to: ${targetLang}`);
     }
 
-    // Ignore translation for specific languages
-    if (IGNORED_LANGUAGES.includes(sourceLang)) {
-        console.log(`Ignoring language: ${sourceLang}`);
+    // Ignore translation for specific languages for this user
+    if (userIgnoredLanguages[user.id] && userIgnoredLanguages[user.id].includes(sourceLang)) {
+        console.log(`User ${user.tag} has ignored ${sourceLang}.`);
         return;
     }
 
