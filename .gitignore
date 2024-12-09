@@ -18,3 +18,12 @@ bin-release/
 # information for Eclipse / Flash Builder.
 node_modules/
 .env
+# macOS
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# VS Code
+.vscode/
