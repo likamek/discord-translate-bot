@@ -111,6 +111,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         await message.reply({
             content: translatedText,
             ephemeral: true,  // Makes the message ephemeral (only visible to the user)
+            allowedMentions: { repliedUser: true } // Ensures the reply is connected to the original message          
         });
         console.log('Sent translated message:', translatedText); // Debugging sent translation
     } catch (err) {
