@@ -30,46 +30,115 @@ Before setting up the bot, make sure you have the following:
 Install Dependencies
 Install the necessary dependencies:
 
-bash
-Copy code
-npm install  
-Configure Environment Variables
-Create a .env file in the root directory and add the following keys:
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-env
-Copy code
-DISCORD_BOT_TOKEN=your-discord-bot-token  
-YANDEX_API_KEY=your-yandex-api-key  
-WHISPER_API_KEY=your-whisper-api-key  
-GOOGLE_DRIVE_WHISPER_LINK_ENGLISH=link-to-english-whisper-model  
-GOOGLE_DRIVE_WHISPER_LINK_RUSSIAN=link-to-russian-whisper-model  
-LIVE_CHAT_CHANNEL_ID=your-discord-live-chat-channel-id  
-Download Whisper Models
-The Whisper models will be downloaded from Google Drive. Ensure the correct links are placed in the .env file for the models:
+3. Create a `.env` file in the root directory:
+   ```
+   BOT_TOKEN=your_discord_bot_token
+   OPENAI_API_KEY=your_openai_api_key
+   PORT=3000
+   ```
 
-English Whisper Model
-Russian Whisper Model
-Deploy on Render
-Follow the Render instructions to deploy your bot. You can use the free hosting platform to keep the bot running 24/7.
+4. Add Vosk models to the `models` folder and ensure the paths match those in the code.
 
-Set Up UptimeRobot
-Use UptimeRobot to monitor your bot's status and receive alerts if it goes down.
+---
 
-Update Google Drive Links for Whisper Models
-Ensure the links to the Whisper models in your Google Drive are correctly set up and accessible.
+## Usage
 
-Set Up Discord App in Developer Mode
+### Running the Bot
+Start the bot by running:
+```bash
+node bot.js
+```
+You should see logs indicating the bot has started and connected to Discord.
 
-Create a new bot on the Discord Developer Portal.
-Enable Developer Mode and use the bot's token in your .env file.
-Usage
-Once set up, the bot will:
+### Bot Commands
 
-Translate Text: Automatically translate messages based on the recipient's preferred language.
-Transcribe Voice Messages: Convert audio messages into text and translate them.
-Real-Time Live Chat Transcription: Join a voice channel, transcribe ongoing conversation, and translate it for users.
-Contributing
-Feel free to fork the repository and submit a pull request with your improvements. Contributions are welcome!
+#### **Set Preferred Language**
+Command:
+```
+/language <language_code>
+```
+Example:
+```
+/language fr
+```
+Sets the user’s preferred language for translations.
 
-License
-This project is licensed under the MIT License.
+#### **Ignore a Language**
+Command:
+```
+/ignore <language_code>
+```
+Example:
+```
+/ignore es
+```
+Prevents the bot from translating messages in the specified language.
+
+#### **Toggle Auto-Translation**
+Command:
+```
+/toggletranslations
+```
+Enables or disables auto-translation for the user.
+
+#### **Set Translation Channel**
+Command:
+```
+/settranslationchannel <channel_id>
+```
+Example:
+```
+/settranslationchannel 123456789012345678
+```
+Toggles translation features on or off for a specific channel. Requires `Manage Channels` permission.
+
+### Emoji-Based Translation
+React to a message with “💭” to trigger a translation into your preferred language.
+
+---
+
+## File Structure
+
+```
+.
+├── bot.js                  # Main bot file
+├── models/                 # Folder containing Vosk speech-to-text models
+├── .env                    # Environment variables file
+├── package.json            # Node.js dependencies and scripts
+├── README.md               # Documentation
+```
+
+---
+
+## Troubleshooting
+
+### Common Issues
+- **Bot Fails to Start**: Ensure all dependencies are installed and `.env` is properly configured.
+- **Translation Not Working**: Verify your OpenAI API key and check if your account has sufficient credits.
+- **Voice Transcription Issues**: Ensure the correct Vosk models are installed and paths match in the code.
+
+### Logs
+Use the console output to debug issues. Errors related to Discord API or OpenAI will appear in the logs.
+
+---
+
+## Contributing
+Contributions are welcome! Feel free to submit pull requests or open issues to improve the bot.
+
+---
+
+## License
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+---
+
+## Credits
+- [OpenAI](https://openai.com/) for GPT models
+- [Vosk](https://alphacephei.com/vosk/) for speech-to-text models
+- [Discord.js](https://discord.js.org/) for the Discord API wrapper
+
